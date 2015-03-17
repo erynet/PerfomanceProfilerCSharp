@@ -369,7 +369,7 @@ namespace Direct3DHookLib.Hook
                             Elements =
                             {
                                 //new Direct3DHookLib.Hook.Common.TextElement(new System.Drawing.Font("Times New Roman", 22)) { Text = "Test", Location = new System.Drawing.Point(200, 200), Color = System.Drawing.Color.Yellow, AntiAliased = false},
-                                new Direct3DHookLib.Hook.Common.FramesPerSecond(new System.Drawing.Font("Arial", 16)) { Location = new System.Drawing.Point(5,5), Color = System.Drawing.Color.Red, AntiAliased = true }
+                                new Direct3DHookLib.Hook.Common.FramesPerSecond(new System.Drawing.Font("Serif", 64)) { Location = new System.Drawing.Point(5,5), Color = System.Drawing.Color.Red, AntiAliased = true }
                             }
                         });
                         _overlayEngine.Initialise(swapChain);

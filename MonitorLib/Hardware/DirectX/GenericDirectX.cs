@@ -32,6 +32,10 @@ namespace MonitorLib.Hardware.DirectX
         private CaptureProcess _captureProcess;
 
         private TimeSpan fpsTickTimeSpan;
+        private Int32 fpsTickCount;
+
+        private StreamWriter fpsTimecodeWriter;
+        private string fpsTimecodeWriterBuffer;
 
         public GenericDirectX(string processImageName, ISettings settings) : base("DirectX", new Identifier("DirectX"), settings)
         {
@@ -49,6 +53,9 @@ namespace MonitorLib.Hardware.DirectX
             if (AttachProcess(processImageName))
             {
                 isAttached = true;
+                CreateTimecodeLog();
+
+
                 pidSensor = new Sensor("Process Id", 0, SensorType.Comment, this, settings);
                 ActivateSensor(pidSensor);
                 dxVersionSensor = new Sensor("DirectX Version", 1, SensorType.Comment, this, settings);
@@ -120,7 +127,7 @@ namespace MonitorLib.Hardware.DirectX
                     CaptureConfig cc = new CaptureConfig()
                     {
                         Direct3DVersion = Direct3DVersion.AutoDetect,
-                        ShowOverlay = true
+                        ShowOverlay = false
                     };
                     var captureInterface = new CaptureInterface();
                     captureInterface.RemoteMessage += new MessageReceivedEvent(CaptureInterface_RemoteMessage);
@@ -166,12 +173,9 @@ namespace MonitorLib.Hardware.DirectX
 
         void CaptureInterface_RemoteMessage(MessageReceivedEventArgs message)
         {
-            //txtDebugLog.Invoke(new MethodInvoker(delegate()
-            //{
-            //    txtDebugLog.Text = String.Format("{0}\r\n{1}", message, txtDebugLog.Text);
-            //})
-            //);
+#if DEBUG
             System.Console.WriteLine(String.Format("{0}", message));
+#endif
         }
 
         void CaptureInterface_RemoteReportProperty(ReportPropertyReceivedEventArgs prop)
@@ -194,14 +198,40 @@ namespace MonitorLib.Hardware.DirectX
 
         void CaptureInterface_RemoteReportFpsTimecode(ReportFpsTimecodeReceivedEventArgs tcode)
         {
-            //tcode
-            fpsTickTimeSpan = TimeSpan.FromTicks(tcode.Ticks);
-            //System.Console.WriteLine("CaptureInterface_RemoteReportFpsTimecode");
+            WriteTimecodeLog(tcode.Ticks);
 #if DEBUG
             //string temp = String.Format("{0}:{1}:{2}.{3}", fpsTickTimeSpan.Hours, fpsTickTimeSpan.Minutes, fpsTickTimeSpan.Seconds, fpsTickTimeSpan.Milliseconds);
-            string temp = String.Format("{0,2:D2}:{1,2:D2}:{2,2:D2}.{3,3:D3}", fpsTickTimeSpan.Hours, fpsTickTimeSpan.Minutes, fpsTickTimeSpan.Seconds, fpsTickTimeSpan.Milliseconds);
+            
             //System.Console.WriteLine("CaptureInterface_RemoteReportFpsTimecode / T : " + temp);
 #endif
+        }
+
+        void CreateTimecodeLog()
+        {
+            fpsTickCount = 0;
+            fpsTimecodeWriterBuffer = "";
+            var now = DateTime.Now;
+            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "Log"))
+            {
+                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "Log");
+            }
+            fpsTimecodeWriter = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "Log" + Path.DirectorySeparatorChar + string.Format("TimeCode-{0:yyyy-MM-dd-H-mm-ss}.csv", now), false);
+        }
+
+        void WriteTimecodeLog(Int64 Tick)
+        {
+            fpsTickCount += 1;
+
+            fpsTickTimeSpan = TimeSpan.FromTicks(Tick);
+            fpsTimecodeWriterBuffer += String.Format("{0,2:D2}:{1,2:D2}:{2,2:D2}.{3,3:D3},", fpsTickTimeSpan.Hours, fpsTickTimeSpan.Minutes, fpsTickTimeSpan.Seconds, fpsTickTimeSpan.Milliseconds);
+            fpsTimecodeWriterBuffer += System.Environment.NewLine;
+            
+            if ((fpsTickCount % 30) == 0)
+            {
+                fpsTimecodeWriter.Write(fpsTimecodeWriterBuffer);
+                fpsTimecodeWriterBuffer = "";
+                fpsTimecodeWriter.Flush();
+            }
         }
     }
 }

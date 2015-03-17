@@ -247,13 +247,11 @@ namespace Direct3DHookLib.Interface
 
         public void ReportProperty(Int32 pid, float dxVersion)
         {
-            //System.Console.WriteLine("##### ReportProperty / Pid : " + pid + ", dxVersion : " + dxVersion);
             SafeInvokeReportPropertyReceived(new ReportPropertyReceivedEventArgs(pid, dxVersion));
         }
 
         public void ReportFps(float fps)
         {
-            //System.Console.WriteLine("##### ReportFps / fps : " + fps);
             SafeInvokeReportFpsReceived(new ReportFpsReceivedEventArgs(fps));
         }
 

@@ -392,8 +392,8 @@ namespace Direct3DHookLib.Hook
                         {
                             FontDescription fd = new SharpDX.Direct3D10.FontDescription()
                             {
-                                Height = 16,
-                                FaceName = "Arial",
+                                Height = 64,
+                                FaceName = "Serif",
                                 Italic = false,
                                 Width = 0,
                                 MipLevels = 1,

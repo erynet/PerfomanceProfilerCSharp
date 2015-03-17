@@ -65,6 +65,9 @@ namespace ProfilerCS.GUI {
         private UserRadioGroup loggingInterval;
         private Logger logger;
 
+        private UserOption fpsOverlay;
+        
+
         private string processImageName;
 
         private bool haveTargetProcess = false;
@@ -73,7 +76,6 @@ namespace ProfilerCS.GUI {
     public MainForm() {
         InitializeComponent();
 
-        // check if the OpenHardwareMonitorLib assembly has the correct version\
         /*
         if (Assembly.GetAssembly(typeof(Computer)).GetName().Version !=
         Assembly.GetExecutingAssembly().GetName().Version) {
@@ -84,6 +86,7 @@ namespace ProfilerCS.GUI {
         }
         */
 
+        
         this.settings = new PersistentSettings();
         this.settings.Load(Path.ChangeExtension(Application.ExecutablePath, ".config"));
 
@@ -128,6 +131,8 @@ namespace ProfilerCS.GUI {
             haveTargetProcess = false;
             processRoot = new Node("Process : N/A");
             treeModel.Nodes.Add(processRoot);
+
+            fpsOverlayMenuItem.Enabled = false;
         }
 
 
@@ -295,23 +300,29 @@ namespace ProfilerCS.GUI {
 
         logSensors = new UserOption("logSensorsMenuItem", false, logSensorsMenuItem, settings);
 
-        loggingInterval = new UserRadioGroup("loggingInterval", 0, new[] { log1sMenuItem, log2sMenuItem, log5sMenuItem, log10sMenuItem, log30sMenuItem, log1minMenuItem, log2minMenuItem, log5minMenuItem, log10minMenuItem, log30minMenuItem, log1hMenuItem, log2hMenuItem, log6hMenuItem}, settings);
+        loggingInterval = new UserRadioGroup("loggingInterval", 0, new[] { log100msMenuItem, log200msMenuItem, log500msMenuItem, log1sMenuItem, log3sMenuItem, log5sMenuItem}, settings); //log2minMenuItem, log5minMenuItem, log10minMenuItem, log30minMenuItem, log1hMenuItem, log2hMenuItem, log6hMenuItem}, settings);
         loggingInterval.Changed += (sender, e) => {
             switch (loggingInterval.Value) {
-                case 0: logger.LoggingInterval = new TimeSpan(0, 0, 1); break;
-                case 1: logger.LoggingInterval = new TimeSpan(0, 0, 2); break;
-                case 2: logger.LoggingInterval = new TimeSpan(0, 0, 5); break;
-                case 3: logger.LoggingInterval = new TimeSpan(0, 0, 10); break;
-                case 4: logger.LoggingInterval = new TimeSpan(0, 0, 30); break;
-                case 5: logger.LoggingInterval = new TimeSpan(0, 1, 0); break;
-                case 6: logger.LoggingInterval = new TimeSpan(0, 2, 0); break;
-                case 7: logger.LoggingInterval = new TimeSpan(0, 5, 0); break;
-                case 8: logger.LoggingInterval = new TimeSpan(0, 10, 0); break;
-                case 9: logger.LoggingInterval = new TimeSpan(0, 30, 0); break;
-                case 10: logger.LoggingInterval = new TimeSpan(1, 0, 0); break;
-                case 11: logger.LoggingInterval = new TimeSpan(2, 0, 0); break;
-                case 12: logger.LoggingInterval = new TimeSpan(6, 0, 0); break;
+                case 0: logger.LoggingInterval = TimeSpan.FromMilliseconds(100); break;
+                case 1: logger.LoggingInterval = TimeSpan.FromMilliseconds(200); break;
+                case 2: logger.LoggingInterval = TimeSpan.FromMilliseconds(500); break;
+                case 3: logger.LoggingInterval = TimeSpan.FromMilliseconds(1000); break; break;
+                case 4: logger.LoggingInterval = TimeSpan.FromMilliseconds(2000); break; break;
+                //case 5: logger.LoggingInterval = new TimeSpan(0, 0, 5); break;
+                //case 6: logger.LoggingInterval = new TimeSpan(0, 2, 0); break;
+                //case 7: logger.LoggingInterval = new TimeSpan(0, 5, 0); break;
+                //case 8: logger.LoggingInterval = new TimeSpan(0, 10, 0); break;
+                //case 9: logger.LoggingInterval = new TimeSpan(0, 30, 0); break;
+                //case 10: logger.LoggingInterval = new TimeSpan(1, 0, 0); break;
+                //case 11: logger.LoggingInterval = new TimeSpan(2, 0, 0); break;
+                //case 12: logger.LoggingInterval = new TimeSpan(6, 0, 0); break;
             }
+        };
+
+        fpsOverlay = new UserOption("fpsOverlayMenuItem", false, fpsOverlayMenuItem, settings);
+        fpsOverlay.Changed += delegate(object sender, EventArgs e)
+        {
+            //systemTray.IsMainIconEnabled = minimizeToTray.Value;
         };
 
         InitializePlotForm();
@@ -900,6 +911,11 @@ namespace ProfilerCS.GUI {
 
     private void treeView_MouseUp(object sender, MouseEventArgs e) {
         selectionDragging = false;
+    }
+
+    private void log100msMenuItem_Click(object sender, EventArgs e)
+    {
+
     }
 
     //private void serverPortMenuItem_Click(object sender, EventArgs e) {
