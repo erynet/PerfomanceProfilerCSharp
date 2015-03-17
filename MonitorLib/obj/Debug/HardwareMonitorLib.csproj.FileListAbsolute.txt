@@ -1,0 +1,5 @@
+E:\Projects\CSharp\ProfilerCS\Bin\Debug\HardwareMonitorLib.dll
+E:\Projects\CSharp\ProfilerCS\Bin\Debug\HardwareMonitorLib.pdb
+E:\Projects\CSharp\ProfilerCS\HardwareMonitorLib\obj\Debug\HardwareMonitorLib.dll
+E:\Projects\CSharp\ProfilerCS\HardwareMonitorLib\obj\Debug\HardwareMonitorLib.pdb
+E:\Projects\CSharp\ProfilerCS\HardwareMonitorLib\obj\Debug\HardwareMonitorLib.csprojResolveAssemblyReference.cache

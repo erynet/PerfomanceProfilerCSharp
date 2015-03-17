@@ -1,0 +1,10 @@
+E:\Projects\CSharp\ProfilerCS\Bin\Release\sharpdx_direct3d11_effects_x64.dll
+E:\Projects\CSharp\ProfilerCS\Bin\Release\sharpdx_direct3d11_effects_x86.dll
+E:\Projects\CSharp\ProfilerCS\Bin\Release\ProfilerCS.exe.config
+E:\Projects\CSharp\ProfilerCS\Bin\Release\ProfilerCS.exe
+E:\Projects\CSharp\ProfilerCS\ProfilerCS\obj\Release\ProfilerCS.csprojResolveAssemblyReference.cache
+E:\Projects\CSharp\ProfilerCS\ProfilerCS\obj\Release\ProfilerCS.GUI.ParameterForm.resources
+E:\Projects\CSharp\ProfilerCS\ProfilerCS\obj\Release\ProfilerCS.GUI.CrashForm.resources
+E:\Projects\CSharp\ProfilerCS\ProfilerCS\obj\Release\ProfilerCS.GUI.MainForm.resources
+E:\Projects\CSharp\ProfilerCS\ProfilerCS\obj\Release\ProfilerCS.csproj.GenerateResource.Cache
+E:\Projects\CSharp\ProfilerCS\ProfilerCS\obj\Release\ProfilerCS.exe

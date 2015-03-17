@@ -1,0 +1,7 @@
+E:\Projects\CSharp\ProfilerCS\Bin\Debug\sharpdx_direct3d11_effects_x64.dll
+E:\Projects\CSharp\ProfilerCS\Bin\Debug\sharpdx_direct3d11_effects_x86.dll
+E:\Projects\CSharp\ProfilerCS\Bin\Debug\MonitorLib.dll
+E:\Projects\CSharp\ProfilerCS\Bin\Debug\MonitorLib.pdb
+E:\Projects\CSharp\ProfilerCS\MonitorLib\obj\Debug\MonitorLib.csprojResolveAssemblyReference.cache
+E:\Projects\CSharp\ProfilerCS\MonitorLib\obj\Debug\MonitorLib.dll
+E:\Projects\CSharp\ProfilerCS\MonitorLib\obj\Debug\MonitorLib.pdb

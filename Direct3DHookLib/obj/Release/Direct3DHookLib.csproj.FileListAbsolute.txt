@@ -1,0 +1,9 @@
+E:\Projects\CSharp\ProfilerCS\bin\Release\sharpdx_direct3d11_effects_x64.dll
+E:\Projects\CSharp\ProfilerCS\bin\Release\sharpdx_direct3d11_effects_x86.dll
+E:\Projects\CSharp\ProfilerCS\bin\Release\Direct3DHookLib.dll
+E:\Projects\CSharp\ProfilerCS\bin\Release\Direct3DHookLib.pdb
+E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.csprojResolveAssemblyReference.cache
+E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.Properties.Resources.resources
+E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.csproj.GenerateResource.Cache
+E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.dll
+E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.pdb
