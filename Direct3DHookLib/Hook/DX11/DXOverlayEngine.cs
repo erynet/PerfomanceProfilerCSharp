@@ -32,6 +32,7 @@ namespace Direct3DHookLib.Hook.DX11
 
         public DXOverlayEngine()
         {
+            System.Console.WriteLine("### DXOverlayEngine ###");
             Overlays = new List<IOverlay>();
         }
 

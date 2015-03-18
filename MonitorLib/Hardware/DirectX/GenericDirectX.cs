@@ -2,6 +2,7 @@
 using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -18,7 +19,7 @@ namespace MonitorLib.Hardware.DirectX
     {
         private Int32 Pid { get; set; }
         private float DxVersion { get; set; }
-        private float Fps { get; set; }
+        private double Fps { get; set; }
         //private Sensor loadSensor;
         //private Sensor usedMemory;
         //private Sensor availableMemory;
@@ -37,18 +38,16 @@ namespace MonitorLib.Hardware.DirectX
         private StreamWriter fpsTimecodeWriter;
         private string fpsTimecodeWriterBuffer;
 
-        public GenericDirectX(string processImageName, ISettings settings) : base("DirectX", new Identifier("DirectX"), settings)
+        BQueue<Int64> TimecodeQueue;
+        CancellationTokenSource ThreadCTS;
+
+        public GenericDirectX(string processImageName, ISettings settings)
+            : base("DirectX", new Identifier("DirectX"), settings)
         {
-            //loadSensor = new Sensor("Memory", 0, SensorType.Load, this, settings);
-            //ActivateSensor(loadSensor);
-
-            //usedMemory = new Sensor("Used Memory", 0, SensorType.Data, this, settings);
-            //ActivateSensor(usedMemory);
-
-            //availableMemory = new Sensor("Available Memory", 1, SensorType.Data, this, settings);
-            //ActivateSensor(availableMemory);
-
             fpsTickTimeSpan = new TimeSpan();
+
+            TimecodeQueue = new BQueue<Int64>(4096);
+            ThreadCTS = new CancellationTokenSource();
 
             if (AttachProcess(processImageName))
             {
@@ -64,6 +63,8 @@ namespace MonitorLib.Hardware.DirectX
 
                 fpsSensor = new Sensor("FPS(Present)", 0, SensorType.FPS, this, settings);
                 ActivateSensor(fpsSensor);
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DoWriteTimecodeLog), ThreadCTS.Token);
             }
             else
             {
@@ -83,24 +84,13 @@ namespace MonitorLib.Hardware.DirectX
 
         public override void Update()
         {
-            //NativeMethods.MemoryStatusEx status = new NativeMethods.MemoryStatusEx();
-            //status.Length = checked((uint)Marshal.SizeOf(typeof(NativeMethods.MemoryStatusEx)));
-
-            //if (!NativeMethods.GlobalMemoryStatusEx(ref status))
-            //    return;
-
-            //loadSensor.Value = 100.0f - (100.0f * status.AvailablePhysicalMemory) / status.TotalPhysicalMemory;
-
-            //usedMemory.Value = (float)(status.TotalPhysicalMemory - status.AvailablePhysicalMemory) / (1024 * 1024 * 1024);
-
-            //availableMemory.Value = (float)status.AvailablePhysicalMemory / (1024 * 1024 * 1024);
             if (isAttached)
             {
                 pidSensor.Value = Pid;
                 dxVersionSensor.Value = DxVersion;
-                fpsSensor.Value = Fps;
+                fpsSensor.Value = (float)Fps;
             }
-            
+
         }
 
         private bool AttachProcess(string processImageName)
@@ -111,11 +101,12 @@ namespace MonitorLib.Hardware.DirectX
             LogN("exeName : " + exeName);
 
             Process[] processes = Process.GetProcessesByName(exeName);
-            
+
             LogN("processes.Length : " + processes.Length);
-            foreach(Process process in processes)
+            foreach (Process process in processes)
             {
-                try {
+                try
+                {
                     if (process.MainWindowHandle == IntPtr.Zero)
                     {
                         continue;
@@ -136,10 +127,10 @@ namespace MonitorLib.Hardware.DirectX
                     captureInterface.RemoteReportFps += new ReportFpsReceivedEvent(CaptureInterface_RemoteReportFps);
                     captureInterface.RemoteReportFpsTimecode += new ReportFpsTimecodeReceivedEvent(CaptureInterface_RemoteReportFpsTimecode);
                     _captureProcess = new CaptureProcess(process, cc, captureInterface);
-                    
+
                     break;
                 }
-                catch 
+                catch
                 {
                     LogN("Maybe Access deinied : " + process.ProcessName);
                 }
@@ -181,7 +172,7 @@ namespace MonitorLib.Hardware.DirectX
 
         void CaptureInterface_RemoteReportProperty(ReportPropertyReceivedEventArgs prop)
         {
-            
+
             Pid = prop.Pid;
             DxVersion = prop.DxVersion;
 #if DEBUG
@@ -197,12 +188,14 @@ namespace MonitorLib.Hardware.DirectX
             //System.Console.WriteLine("Fps : " + Fps);
         }
 
-        void CaptureInterface_RemoteReportFpsTimecode(ReportFpsTimecodeReceivedEventArgs tcode)
+        void CaptureInterface_RemoteReportFpsTimecode(ReportFpsTimecodeReceivedEventArgs timecode)
         {
-            WriteTimecodeLog(tcode.Ticks);
+            TimecodeQueue.TryAdd(timecode.Ticks, 100);
+
+            //WriteTimecodeLog(tcode.Ticks);
 #if DEBUG
             //string temp = String.Format("{0}:{1}:{2}.{3}", fpsTickTimeSpan.Hours, fpsTickTimeSpan.Minutes, fpsTickTimeSpan.Seconds, fpsTickTimeSpan.Milliseconds);
-            
+
             //System.Console.WriteLine("CaptureInterface_RemoteReportFpsTimecode / T : " + temp);
 #endif
         }
@@ -226,7 +219,7 @@ namespace MonitorLib.Hardware.DirectX
             fpsTickTimeSpan = TimeSpan.FromTicks(Tick);
             fpsTimecodeWriterBuffer += String.Format("{0,2:D2}:{1,2:D2}:{2,2:D2}.{3,3:D3},", fpsTickTimeSpan.Hours, fpsTickTimeSpan.Minutes, fpsTickTimeSpan.Seconds, fpsTickTimeSpan.Milliseconds);
             fpsTimecodeWriterBuffer += System.Environment.NewLine;
-            
+
             if ((fpsTickCount % 30) == 0)
             {
                 fpsTimecodeWriter.Write(fpsTimecodeWriterBuffer);
@@ -235,9 +228,58 @@ namespace MonitorLib.Hardware.DirectX
             }
         }
 
+        void DoWriteTimecodeLog(object obj)
+        {
+            Int64 item;
+            CancellationToken token = (CancellationToken)obj;
+
+            LogN("DoWriteTimecodeLog / Thread Init");
+
+            while (true)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    LogN("DoWriteTimecodeLog / Thread Exit");
+                    break;
+                }
+
+                if (TimecodeQueue.TryTake(out item, 200))
+                {
+                    WriteTimecodeLog(item);
+                }
+            }
+        }
+
+
         void UnHookOnAppExit(object sender, EventArgs e)
         {
+            LogN("UnHookOnAppExit / ThreadCTS.Cancel()");
+            ThreadCTS.Cancel();
+            LogN("UnHookOnAppExit / _captureProcess.CaptureInterface.Disconnect()");
             _captureProcess.CaptureInterface.Disconnect();
         }
+    }
+
+    internal class BQueue<T> : BlockingCollection<T>
+    {
+        /// <summary>
+        /// Initializes a new instance of the BQueue, Use Add and TryAdd for Enqueue and TryEnqueue and Take and TryTake for Dequeue and TryDequeue functionality
+        /// </summary>
+        public BQueue()
+            : base(new ConcurrentQueue<T>())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the BQueue, Use Add and TryAdd for Enqueue and TryEnqueue and Take and TryTake for Dequeue and TryDequeue functionality
+        /// </summary>
+        /// <param name="maxSize"></param>
+        public BQueue(int maxSize)
+            : base(new ConcurrentQueue<T>(), maxSize)
+        {
+        }
+
+
+
     }
 }

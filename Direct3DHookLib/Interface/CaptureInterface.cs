@@ -253,7 +253,7 @@ namespace Direct3DHookLib.Interface
             SafeInvokeReportPropertyReceived(new ReportPropertyReceivedEventArgs(pid, dxVersion));
         }
 
-        public void ReportFps(float fps)
+        public void ReportFps(double fps)
         {
             SafeInvokeReportFpsReceived(new ReportFpsReceivedEventArgs(fps));
         }

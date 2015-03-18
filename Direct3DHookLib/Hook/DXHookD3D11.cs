@@ -70,10 +70,12 @@ namespace Direct3DHookLib.Hook
     internal class DXHookD3D11: BaseDXHook
     {
         const int D3D11_DEVICE_METHOD_COUNT = 43;
+        private System.Drawing.Font font;
 
         public DXHookD3D11(CaptureInterface ssInterface)
             : base(ssInterface)
         {
+            font = null;
         }
 
         List<IntPtr> _d3d11VTblAddresses = null;
@@ -363,13 +365,21 @@ namespace Direct3DHookLib.Hook
                         if (_overlayEngine != null)
                             _overlayEngine.Dispose();
 
+                        if (font == null)
+                            font = new System.Drawing.Font("Serif", 64);
+
                         _overlayEngine = new DX11.DXOverlayEngine();
                         _overlayEngine.Overlays.Add(new Direct3DHookLib.Hook.Common.Overlay
                         {
                             Elements =
                             {
                                 //new Direct3DHookLib.Hook.Common.TextElement(new System.Drawing.Font("Times New Roman", 22)) { Text = "Test", Location = new System.Drawing.Point(200, 200), Color = System.Drawing.Color.Yellow, AntiAliased = false},
-                                new Direct3DHookLib.Hook.Common.FramesPerSecond(new System.Drawing.Font("Serif", 64)) { Location = new System.Drawing.Point(5,5), Color = System.Drawing.Color.Red, AntiAliased = true }
+                                new Direct3DHookLib.Hook.Common.FramesPerSecond(font) 
+                                {
+                                    Location = new System.Drawing.Point(5,5), 
+                                    Color = System.Drawing.Color.Red, 
+                                    AntiAliased = true
+                                }
                             }
                         });
                         _overlayEngine.Initialise(swapChain);

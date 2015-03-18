@@ -131,11 +131,27 @@ namespace Direct3DHookLib.Hook
     internal class DXHookD3D10_1: BaseDXHook
     {
         const int D3D10_1_DEVICE_METHOD_COUNT = 101;
+        private FontDescription fd;
+        private Font font;
 
         public DXHookD3D10_1(CaptureInterface ssInterface)
             : base(ssInterface)
         {
             this.DebugMessage("Create");
+            fd = new SharpDX.Direct3D10.FontDescription()
+                {
+                    Height = 64,
+                    FaceName = "Serif",
+                    Italic = false,
+                    Width = 0,
+                    MipLevels = 1,
+                    CharacterSet = SharpDX.Direct3D10.FontCharacterSet.Default,
+                    OutputPrecision = SharpDX.Direct3D10.FontPrecision.Default,
+                    Quality = SharpDX.Direct3D10.FontQuality.Antialiased,
+                    PitchAndFamily = FontPitchAndFamily.Default | FontPitchAndFamily.DontCare,
+                    Weight = FontWeight.Bold
+                };
+            font = null;
         }
 
         List<IntPtr> _d3d10_1VTblAddresses = null;
@@ -392,30 +408,33 @@ namespace Direct3DHookLib.Hook
                         {
                             if (FPS.GetFPS() >= 1)
                             {
-                                FontDescription fd = new SharpDX.Direct3D10.FontDescription()
-                                {
-                                    Height = 64,
-                                    FaceName = "Serif",
-                                    Italic = false,
-                                    Width = 0,
-                                    MipLevels = 1,
-                                    CharacterSet = SharpDX.Direct3D10.FontCharacterSet.Default,
-                                    OutputPrecision = SharpDX.Direct3D10.FontPrecision.Default,
-                                    Quality = SharpDX.Direct3D10.FontQuality.Antialiased,
-                                    PitchAndFamily = FontPitchAndFamily.Default | FontPitchAndFamily.DontCare,
-                                    Weight = FontWeight.Bold
-                                };
+                                //FontDescription fd = new SharpDX.Direct3D10.FontDescription()
+                                //{
+                                //    Height = 64,
+                                //    FaceName = "Serif",
+                                //    Italic = false,
+                                //    Width = 0,
+                                //    MipLevels = 1,
+                                //    CharacterSet = SharpDX.Direct3D10.FontCharacterSet.Default,
+                                //    OutputPrecision = SharpDX.Direct3D10.FontPrecision.Default,
+                                //    Quality = SharpDX.Direct3D10.FontQuality.Antialiased,
+                                //    PitchAndFamily = FontPitchAndFamily.Default | FontPitchAndFamily.DontCare,
+                                //    Weight = FontWeight.Bold
+                                //};
 
                                 // TODO: do not create font every frame!
-                                using (Font font = new Font(texture.Device, fd))
-                                {
-                                    DrawText(font, new Vector2(5, 5), String.Format("{0:N0} fps", FPS.GetFPS()), new Color4(Color.Red.ToColor3()));
+                                if (font == null)
+                                    font = new Font(texture.Device, fd);
 
-                                    if (this.TextDisplay != null && this.TextDisplay.Display)
-                                    {
-                                        DrawText(font, new Vector2(5, 25), this.TextDisplay.Text, new Color4(Color.Red.ToColor3(), (Math.Abs(1.0f - TextDisplay.Remaining))));
-                                    }
+                                //using (Font font = new Font(texture.Device, fd))
+                                //{
+                                DrawText(font, new Vector2(5, 5), String.Format("{0:N0} fps", FPS.GetFPS()), new Color4(Color.Red.ToColor3()));
+
+                                if (this.TextDisplay != null && this.TextDisplay.Display)
+                                {
+                                    DrawText(font, new Vector2(5, 25), this.TextDisplay.Text, new Color4(Color.Red.ToColor3(), (Math.Abs(1.0f - TextDisplay.Remaining))));
                                 }
+                                //}
                             }
                         }
                     }

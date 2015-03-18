@@ -18,6 +18,27 @@ namespace Direct3DHookLib.Hook
     {
         protected readonly ClientCaptureInterfaceEventProxy InterfaceEventProxy = new ClientCaptureInterfaceEventProxy();
 
+
+        private Int64 BaseTimestamp;
+        private Int64 BaseTimestampFrequency;
+        private Int64 BaseTick;
+        
+        private Int64 TimeStamp
+        {
+            get
+            {
+                return Stopwatch.GetTimestamp() - this.BaseTimestamp;
+            }
+        }
+
+        private Int64 QPCTick
+        {
+            get
+            {
+                return (Int64)(((Stopwatch.GetTimestamp() - this.BaseTimestamp) / (this.BaseTimestampFrequency * 1.0)) * 10000000) + this.BaseTick;
+            }
+        }
+
         public BaseDXHook(CaptureInterface ssInterface)
         {
             this.Interface = ssInterface;
@@ -29,6 +50,10 @@ namespace Direct3DHookLib.Hook
             Interface.DisplayText += InterfaceEventProxy.DisplayTextProxyHandler;
             InterfaceEventProxy.ScreenshotRequested += new ScreenshotRequestedEvent(InterfaceEventProxy_ScreenshotRequested);
             InterfaceEventProxy.DisplayText += new DisplayTextEvent(InterfaceEventProxy_DisplayText);
+
+            this.BaseTick = DateTime.Now.Ticks;
+            this.BaseTimestamp = Stopwatch.GetTimestamp();
+            this.BaseTimestampFrequency = Stopwatch.Frequency;
         }
         ~BaseDXHook()
         {
@@ -86,7 +111,9 @@ namespace Direct3DHookLib.Hook
             if (TextDisplay != null && TextDisplay.Display) 
                 TextDisplay.Frame();
             //
-            this.Interface.ReportFpsTimecode(DateTime.Now.Ticks);
+            //this.Interface.ReportFpsTimecode(DateTime.Now.Ticks);
+            //QPCTick
+            this.Interface.ReportFpsTimecode(QPCTick);
             this.Interface.ReportFps(FPS.GetFPS());
             //
         }

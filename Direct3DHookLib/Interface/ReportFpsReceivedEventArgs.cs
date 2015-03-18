@@ -8,9 +8,9 @@ namespace Direct3DHookLib.Interface
     [Serializable]   
     public class ReportFpsReceivedEventArgs: MarshalByRefObject
     {
-        public float Fps { get; set; }
+        public double Fps { get; set; }
 
-        public ReportFpsReceivedEventArgs(float fps)
+        public ReportFpsReceivedEventArgs(double fps)
         {   
             Fps = fps;
             //System.Console.WriteLine(" #####ReportFpsReceivedEventArgs / fps : " + Fps);
