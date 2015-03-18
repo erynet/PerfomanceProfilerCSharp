@@ -55,6 +55,7 @@ namespace MonitorLib.Hardware.DirectX
                 isAttached = true;
                 CreateTimecodeLog();
 
+                AppDomain.CurrentDomain.ProcessExit += new EventHandler(UnHookOnAppExit);
 
                 pidSensor = new Sensor("Process Id", 0, SensorType.Comment, this, settings);
                 ActivateSensor(pidSensor);
@@ -127,7 +128,7 @@ namespace MonitorLib.Hardware.DirectX
                     CaptureConfig cc = new CaptureConfig()
                     {
                         Direct3DVersion = Direct3DVersion.AutoDetect,
-                        ShowOverlay = false
+                        ShowOverlay = true
                     };
                     var captureInterface = new CaptureInterface();
                     captureInterface.RemoteMessage += new MessageReceivedEvent(CaptureInterface_RemoteMessage);
@@ -232,6 +233,11 @@ namespace MonitorLib.Hardware.DirectX
                 fpsTimecodeWriterBuffer = "";
                 fpsTimecodeWriter.Flush();
             }
+        }
+
+        void UnHookOnAppExit(object sender, EventArgs e)
+        {
+            _captureProcess.CaptureInterface.Disconnect();
         }
     }
 }

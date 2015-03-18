@@ -26,8 +26,7 @@ namespace ProfilerCS
 #if DEBUG
             AllocConsole();
 #endif
-            //System.Console.WriteLine("Hello World");
-
+            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             using (GUI.MainForm form = new GUI.MainForm())

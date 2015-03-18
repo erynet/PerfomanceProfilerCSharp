@@ -226,6 +226,9 @@ namespace Direct3DHookLib.Interface
         /// </summary>
         public void Disconnect()
         {
+#if DEBUG
+            System.Console.WriteLine("CaptureInterface.Disconnect");
+#endif
             SafeInvokeDisconnected();
         }
 
@@ -485,6 +488,9 @@ namespace Direct3DHookLib.Interface
 
         private void SafeInvokeDisconnected()
         {
+#if DEBUG
+            System.Console.WriteLine("SafeInvokeDisconnected");
+#endif
             if (Disconnected == null)
                 return;         //No Listeners
 

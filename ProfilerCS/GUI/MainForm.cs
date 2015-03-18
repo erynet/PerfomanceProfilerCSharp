@@ -300,14 +300,14 @@ namespace ProfilerCS.GUI {
 
         logSensors = new UserOption("logSensorsMenuItem", false, logSensorsMenuItem, settings);
 
-        loggingInterval = new UserRadioGroup("loggingInterval", 0, new[] { log100msMenuItem, log200msMenuItem, log500msMenuItem, log1sMenuItem, log3sMenuItem, log5sMenuItem}, settings); //log2minMenuItem, log5minMenuItem, log10minMenuItem, log30minMenuItem, log1hMenuItem, log2hMenuItem, log6hMenuItem}, settings);
+        loggingInterval = new UserRadioGroup("loggingInterval", 0, new[] { log100msMenuItem, log200msMenuItem, log500msMenuItem, log1sMenuItem, log3sMenuItem}, settings); //log2minMenuItem, log5minMenuItem, log10minMenuItem, log30minMenuItem, log1hMenuItem, log2hMenuItem, log6hMenuItem}, settings);
         loggingInterval.Changed += (sender, e) => {
             switch (loggingInterval.Value) {
                 case 0: logger.LoggingInterval = TimeSpan.FromMilliseconds(100); break;
                 case 1: logger.LoggingInterval = TimeSpan.FromMilliseconds(200); break;
                 case 2: logger.LoggingInterval = TimeSpan.FromMilliseconds(500); break;
-                case 3: logger.LoggingInterval = TimeSpan.FromMilliseconds(1000); break; break;
-                case 4: logger.LoggingInterval = TimeSpan.FromMilliseconds(2000); break; break;
+                case 3: logger.LoggingInterval = TimeSpan.FromMilliseconds(1000); break;
+                case 4: logger.LoggingInterval = TimeSpan.FromMilliseconds(2000); break;
                 //case 5: logger.LoggingInterval = new TimeSpan(0, 0, 5); break;
                 //case 6: logger.LoggingInterval = new TimeSpan(0, 2, 0); break;
                 //case 7: logger.LoggingInterval = new TimeSpan(0, 5, 0); break;

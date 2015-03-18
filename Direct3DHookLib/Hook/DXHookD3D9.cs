@@ -383,7 +383,7 @@ namespace Direct3DHookLib.Hook
                     using (SharpDX.Direct3D9.Font font = new SharpDX.Direct3D9.Font(device, new FontDescription()
                                     {
                                         //Height = 16,
-                                        Height = 64,
+                                        Height = 96,
                                         //FaceName = "Arial",
                                         FaceName = "Serif",
                                         Italic = false,

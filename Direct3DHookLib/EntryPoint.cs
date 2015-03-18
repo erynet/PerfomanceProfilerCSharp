@@ -32,7 +32,7 @@ namespace Direct3DHookLib
             CaptureConfig config)
         {
 #if DEBUG
-            //AllocConsole();
+            AllocConsole();
 #endif
             //System.Console.WriteLine("Direct3DHookLib.EntryPoint");
 
@@ -99,19 +99,38 @@ namespace Direct3DHookLib
                     _runWait.Set();
                 };
 
+#if DEBUG
+                System.Console.WriteLine("EntryPoint.Run #1");
+#endif
+
                 // We start a thread here to periodically check if the host is still running
                 // If the host process stops then we will automatically uninstall the hooks
                 StartCheckHostIsAliveThread();
+
+#if DEBUG
+                System.Console.WriteLine("EntryPoint.Run #2");
+#endif
 
                 // Wait until signaled for exit either when a Disconnect message from the host 
                 // or if the the check is alive has failed to Ping the host.
                 _runWait.WaitOne();
 
+#if DEBUG
+                System.Console.WriteLine("EntryPoint.Run #3");
+#endif
+
                 // we need to tell the check host thread to exit (if it hasn't already)
                 StopCheckHostIsAliveThread();
 
+#if DEBUG
+                System.Console.WriteLine("EntryPoint.Run #4");
+#endif
+
                 // Dispose of the DXHook so any installed hooks are removed correctly
                 DisposeDirectXHook();
+#if DEBUG
+                System.Console.WriteLine("EntryPoint.Run #5");
+#endif
             }
             catch (Exception e)
             {
@@ -145,9 +164,19 @@ namespace Direct3DHookLib
                 }
                 catch (System.Runtime.Remoting.RemotingException) { } // Ignore channel remoting errors
 
+#if DEBUG
+                System.Console.WriteLine("EntryPoint.DisposeDirectXHook #1");
+#endif
+
                 // Dispose of the hooks so they are removed
                 foreach (var dxHook in _directXHooks)
+                {
                     dxHook.Dispose();
+                }
+
+#if DEBUG
+                System.Console.WriteLine("EntryPoint.DisposeDirectXHook #2");
+#endif
 
                 _directXHooks.Clear();
             }

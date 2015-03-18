@@ -144,80 +144,83 @@ namespace ProfilerCS.Utilities {
 
     private string LogBuffer;
 
-    public void Log() {
-      var now = DateTime.Now;
-      
-      if (lastLoggedTime + LoggingInterval - TimeSpan.FromMilliseconds(30) > now)
-        return;      
 
-      if (day != now.Date || !File.Exists(fileName)) {
-          day = now.Date;
-        //fileName = GetFileName(day);
-          fileName = GetFileName(now);
+        public void Log()
+        {
+            var now = DateTime.Now;
 
-        if (!OpenExistingLogFile())
-          CreateNewLogFile();
-      }
+            if (lastLoggedTime + LoggingInterval - TimeSpan.FromMilliseconds(30) > now)
+                return;
 
-      //try
-      //{
-      //    using (StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)))
-      //    {
-      //        //writer.Write(now.ToString("G", CultureInfo.InvariantCulture));
-      //        writer.Write(String.Format("{0,2:D2}:{1,2:D2}:{2,2:D2}.{3,3:D3},", now.TimeOfDay.Hours, now.TimeOfDay.Minutes, now.TimeOfDay.Seconds, now.TimeOfDay.Milliseconds));
-      //        writer.Write(",");
-      //        for (int i = 0; i < sensors.Length; i++)
-      //        {
-      //            if (sensors[i] != null)
-      //            {
-      //                float? value = sensors[i].Value;
-      //                if (value.HasValue)
-      //                    writer.Write(value.Value.ToString("R", CultureInfo.InvariantCulture));
-      //            }
-      //            if (i < sensors.Length - 1)
-      //                writer.Write(",");
-      //            else
-      //                writer.WriteLine();
-      //        }
-      //    }
-      //}
-      //catch (IOException) { }
+            if (day != now.Date || !File.Exists(fileName))
+            {
+                day = now.Date;
+                //fileName = GetFileName(day);
+                fileName = GetFileName(now);
 
-      if (now - lastLogWrittenTime > TimeSpan.FromMilliseconds(3000))
-      {
-          try
-          {
-              using (StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)))
-              {
-                  writer.Write(LogBuffer);
-                  LogBuffer = "";
-                  lastLogWrittenTime = now;
-              }
-          }
-          catch (IOException) { }
-      }
-      else
-      {
-          LogBuffer += String.Format("{0,2:D2}:{1,2:D2}:{2,2:D2}.{3,3:D3},", now.TimeOfDay.Hours, now.TimeOfDay.Minutes, now.TimeOfDay.Seconds, now.TimeOfDay.Milliseconds);
-          LogBuffer += ",";
-          for (int i = 0; i < sensors.Length; i++)
-          {
-              if (sensors[i] != null)
-              {
-                  float? value = sensors[i].Value;
-                  
-                  if (value.HasValue)
-                      LogBuffer += value.Value.ToString("R", CultureInfo.InvariantCulture);
-              }
-              if (i < sensors.Length - 1)
-                  LogBuffer += ",";
-              else
-                  LogBuffer += System.Environment.NewLine;
-          }
+                if (!OpenExistingLogFile())
+                    CreateNewLogFile();
+            }
 
-      }
+            //try
+            //{
+            //    using (StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)))
+            //    {
+            //        //writer.Write(now.ToString("G", CultureInfo.InvariantCulture));
+            //        writer.Write(String.Format("{0,2:D2}:{1,2:D2}:{2,2:D2}.{3,3:D3},", now.TimeOfDay.Hours, now.TimeOfDay.Minutes, now.TimeOfDay.Seconds, now.TimeOfDay.Milliseconds));
+            //        writer.Write(",");
+            //        for (int i = 0; i < sensors.Length; i++)
+            //        {
+            //            if (sensors[i] != null)
+            //            {
+            //                float? value = sensors[i].Value;
+            //                if (value.HasValue)
+            //                    writer.Write(value.Value.ToString("R", CultureInfo.InvariantCulture));
+            //            }
+            //            if (i < sensors.Length - 1)
+            //                writer.Write(",");
+            //            else
+            //                writer.WriteLine();
+            //        }
+            //    }
+            //}
+            //catch (IOException) { }
 
-      lastLoggedTime = now;
+
+            LogBuffer += String.Format("{0,2:D2}:{1,2:D2}:{2,2:D2}.{3,3:D3}", now.TimeOfDay.Hours, now.TimeOfDay.Minutes, now.TimeOfDay.Seconds, now.TimeOfDay.Milliseconds);
+            LogBuffer += ",";
+            for (int i = 0; i < sensors.Length; i++)
+            {
+                if (sensors[i] != null)
+                {
+                    float? value = sensors[i].Value;
+
+                    if (value.HasValue)
+                        LogBuffer += value.Value.ToString("R", CultureInfo.InvariantCulture);
+                }
+                if (i < sensors.Length - 1)
+                    LogBuffer += ",";
+                else
+                    LogBuffer += System.Environment.NewLine;
+            }
+            lastLoggedTime = now;
+
+            if (now - lastLogWrittenTime > TimeSpan.FromMilliseconds(3000))
+            {
+                try
+                {
+                    using (StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)))
+                    {
+                        writer.Write(LogBuffer);
+                        LogBuffer = "";
+                        lastLogWrittenTime = now;
+                    }
+                }
+                catch (IOException) { }
+            }
+
+
+            
+        }
     }
-  }
 }
