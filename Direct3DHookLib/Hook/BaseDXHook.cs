@@ -114,7 +114,7 @@ namespace Direct3DHookLib.Hook
             //this.Interface.ReportFpsTimecode(DateTime.Now.Ticks);
             //QPCTick
             this.Interface.ReportFpsTimecode(QPCTick);
-            this.Interface.ReportFps(FPS.GetFPS());
+            //this.Interface.ReportFps(FPS.GetFPS());
             //
         }
 

@@ -41,12 +41,17 @@ namespace MonitorLib.Hardware.DirectX
         BQueue<Int64> TimecodeQueue;
         CancellationTokenSource ThreadCTS;
 
+        //List<Int64> TimecodeList;
+        Int64[] TimecodeList;
+
         public GenericDirectX(string processImageName, ISettings settings)
             : base("DirectX", new Identifier("DirectX"), settings)
         {
             fpsTickTimeSpan = new TimeSpan();
 
+            TimecodeList = new Int64[4096];//new List<Int64>(4096);
             TimecodeQueue = new BQueue<Int64>(4096);
+
             ThreadCTS = new CancellationTokenSource();
 
             if (AttachProcess(processImageName))
@@ -119,7 +124,7 @@ namespace MonitorLib.Hardware.DirectX
                     CaptureConfig cc = new CaptureConfig()
                     {
                         Direct3DVersion = Direct3DVersion.AutoDetect,
-                        ShowOverlay = true
+                        ShowOverlay = false
                     };
                     var captureInterface = new CaptureInterface();
                     captureInterface.RemoteMessage += new MessageReceivedEvent(CaptureInterface_RemoteMessage);
@@ -230,8 +235,13 @@ namespace MonitorLib.Hardware.DirectX
 
         void DoWriteTimecodeLog(object obj)
         {
+            int currIndex = 0, followIndex = 0, frameCount = 0;
             Int64 item;
+            Int64 lastUpdatedTimecode = Stopwatch.GetTimestamp();
             CancellationToken token = (CancellationToken)obj;
+
+            //const int QPCRes = 1000000;
+            //const int RefreshInterval = 100000;
 
             LogN("DoWriteTimecodeLog / Thread Init");
 
@@ -246,6 +256,29 @@ namespace MonitorLib.Hardware.DirectX
                 if (TimecodeQueue.TryTake(out item, 200))
                 {
                     WriteTimecodeLog(item);
+                    TimecodeList[currIndex % 4096] = item;
+                    currIndex++;
+
+                    if ((item - lastUpdatedTimecode) > 990000) // 0.099 초
+                    {
+                        while (true)
+                        {
+                            if ((TimecodeList[(currIndex - 1) % 4096] - TimecodeList[followIndex % 4096]) <= 10000000) // 1초 간격
+                            {
+                                frameCount = currIndex - followIndex;
+                                break;
+                            }
+                            else if (followIndex >= currIndex)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                followIndex++;
+                            }
+                        }
+                        Fps = frameCount;
+                    }
                 }
             }
         }
