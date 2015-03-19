@@ -124,7 +124,7 @@ namespace MonitorLib.Hardware.DirectX
                     CaptureConfig cc = new CaptureConfig()
                     {
                         Direct3DVersion = Direct3DVersion.AutoDetect,
-                        ShowOverlay = false
+                        ShowOverlay = true
                     };
                     var captureInterface = new CaptureInterface();
                     captureInterface.RemoteMessage += new MessageReceivedEvent(CaptureInterface_RemoteMessage);
