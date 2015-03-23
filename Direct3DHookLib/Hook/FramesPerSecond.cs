@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Direct3DHookLib.Hook.Common;
+
 namespace Direct3DHookLib.Hook
 {
     /// <summary>
@@ -18,28 +20,25 @@ namespace Direct3DHookLib.Hook
         Int64 _currTimestamp = 0;
         Int64 _QPCFrequency = 0;
         double _lastFrameRate = 0;
+
+        SMMHeap _fpsHeap;
         
         public FramesPerSecond()
         {
-#if DEBUG
-            System.Console.Write("[INFO] Using High Precision Timer : ");
-            if (Stopwatch.IsHighResolution)
-                System.Console.WriteLine("Yes");
-            else
-                System.Console.WriteLine("No");
-#endif
             _QPCFrequency = Stopwatch.Frequency;
             _currTimestamp = Stopwatch.GetTimestamp();
             _lastTimestamp = _currTimestamp;
             _lastSecTimestamp = _currTimestamp;
 
-            _frames = 0;
+            //_frames = 0;
+
+            _fpsHeap = new SMMHeap(2048);
         }
 
         /// <summary>
         /// Must be called each frame
         /// </summary>
-        public void Frame(bool differential = true)
+        public void Frame(bool differential = false)
         {
             _currTimestamp = Stopwatch.GetTimestamp();
             if (differential)
@@ -50,12 +49,19 @@ namespace Direct3DHookLib.Hook
             else
             {
                 double elapsed = Math.Abs((_currTimestamp - _lastSecTimestamp) * (1.0 / _QPCFrequency));
-                _frames++;
-                if (elapsed > 1.0)
+                //_frames++;
+                //if (elapsed > 1.0)
+                //{
+                //    _lastFrameRate = (double)(_frames / elapsed);
+                //    _lastSecTimestamp = _currTimestamp;
+                //    _frames = 0;
+                //}
+                //InsertTimestamp(_currTimestamp);
+                InsertTimestamp((Int64)((_currTimestamp / (Stopwatch.Frequency * 1.0)) * 10000000));
+                if (elapsed > 0.1)
                 {
-                    _lastFrameRate = (double)(_frames / elapsed);
+                    _lastFrameRate = _fpsHeap.Size;
                     _lastSecTimestamp = _currTimestamp;
-                    _frames = 0;
                 }
             }
             _lastTimestamp = _currTimestamp;
@@ -68,6 +74,18 @@ namespace Direct3DHookLib.Hook
         public double GetFPS()
         {
             return _lastFrameRate;
+        }
+
+        public void InsertTimestamp(Int64 Timestamp)
+        {
+            _fpsHeap.Insert(Timestamp);
+            while(true)
+            {
+                if ((_fpsHeap.Max - _fpsHeap.Min)  >= 9800000)
+                    _fpsHeap.DeleteMin();
+                else
+                    break;
+            }
         }
     }
 }

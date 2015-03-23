@@ -6,3 +6,4 @@ E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.Proper
 E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.csproj.GenerateResource.Cache
 E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.dll
 E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.pdb
+E:\Projects\CSharp\ProfilerCS\Direct3DHookLib\obj\Release\Direct3DHookLib.csprojResolveAssemblyReference.cache

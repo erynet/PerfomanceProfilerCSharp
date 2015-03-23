@@ -14,7 +14,7 @@ using System.Threading;
 
 namespace Direct3DHookLib.Hook
 {
-    internal abstract class BaseDXHook: IDXHook
+    internal abstract class BaseDXHook : IDXHook
     {
         protected readonly ClientCaptureInterfaceEventProxy InterfaceEventProxy = new ClientCaptureInterfaceEventProxy();
 
@@ -22,7 +22,7 @@ namespace Direct3DHookLib.Hook
         private Int64 BaseTimestamp;
         private Int64 BaseTimestampFrequency;
         private Int64 BaseTick;
-        
+
         private Int64 TimeStamp
         {
             get
@@ -71,7 +71,7 @@ namespace Direct3DHookLib.Hook
 
         protected virtual void InterfaceEventProxy_ScreenshotRequested(ScreenshotRequest request)
         {
-            
+
             this.Request = request;
         }
 
@@ -108,7 +108,7 @@ namespace Direct3DHookLib.Hook
         protected void Frame()
         {
             FPS.Frame();
-            if (TextDisplay != null && TextDisplay.Display) 
+            if (TextDisplay != null && TextDisplay.Display)
                 TextDisplay.Frame();
             //
             //this.Interface.ReportFpsTimecode(DateTime.Now.Ticks);
@@ -265,7 +265,7 @@ namespace Direct3DHookLib.Hook
             get;
             set;
         }
-        
+
         private CaptureConfig _config;
         public CaptureConfig Config
         {
@@ -281,7 +281,7 @@ namespace Direct3DHookLib.Hook
         public ScreenshotRequest Request
         {
             get { return _request; }
-            set { Interlocked.Exchange(ref _request, value);  }
+            set { Interlocked.Exchange(ref _request, value); }
         }
 
         protected List<LocalHook> Hooks = new List<LocalHook>();

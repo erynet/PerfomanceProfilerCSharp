@@ -88,6 +88,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Hook\Common\Overlay.cs" />
+    <Compile Include="Hook\Common\SMMHeap.cs" />
     <Compile Include="Hook\Common\TextElement.cs" />
     <Compile Include="Hook\DX11\DXOverlayEngine.cs" />
     <Compile Include="Hook\DX11\DXFont.cs" />
